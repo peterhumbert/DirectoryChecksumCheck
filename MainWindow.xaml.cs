@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace DirectoryChecksumCheck
 {
@@ -23,6 +24,30 @@ namespace DirectoryChecksumCheck
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void btnChoose1_Click(object sender, RoutedEventArgs e)
+        {
+            System.Diagnostics.Debug.WriteLine(ChooseFolder());
+            
+        }
+
+        private void btnChoose2_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private String ChooseFolder()
+        {
+            var dialog = new CommonOpenFileDialog();
+            dialog.IsFolderPicker = true;
+            CommonFileDialogResult result = dialog.ShowDialog();
+
+            if (result.Equals(CommonFileDialogResult.Ok))
+            {
+                return dialog.FileName;
+            }
+            return null;
         }
     }
 }

@@ -7,6 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <Button x:Name="btnChoose1" Content="Choose Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,10,0,0" Click="btnChoose1_Click"/>
+        <Label x:Name="lblFolder1" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,7,0,0" Width="658"/>
+        <Button x:Name="btnChoose2" Content="Choose Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,41,0,0" Click="btnChoose2_Click"/>
+        <Label x:Name="lblFolder2" Content="Label" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,38,0,0" Width="658"/>
     </Grid>
 </Window>
