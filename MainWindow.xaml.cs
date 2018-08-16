@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using System.IO;
+using System.Security.Cryptography;
 
 namespace DirectoryChecksumCheck
 {
@@ -28,13 +30,12 @@ namespace DirectoryChecksumCheck
 
         private void btnChoose1_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(ChooseFolder());
-            
+            lblFolder1.Content = ChooseFolder();
         }
 
         private void btnChoose2_Click(object sender, RoutedEventArgs e)
         {
-
+            lblFolder2.Content = ChooseFolder();
         }
 
         private String ChooseFolder()
@@ -48,6 +49,44 @@ namespace DirectoryChecksumCheck
                 return dialog.FileName;
             }
             return null;
+        }
+
+        private void btnCompare_Click(object sender, RoutedEventArgs e)
+        {
+            DirectoryInfo di = new DirectoryInfo(lblFolder1.Content.ToString());
+
+            foreach (String s in GetFileDictionary(di).Values)
+            {
+                txtOutput.Text += s + "\n";
+            }
+        }
+
+        private Dictionary<String,String> GetFileDictionary(DirectoryInfo di)
+        {
+            Dictionary<String, String> output = new Dictionary<string, string>();
+
+            foreach (FileInfo f in di.GetFiles())
+            {
+                if (f.Extension.ToLowerInvariant().Equals(".jpg"))
+                {
+                    output.Add(GetFileHash(f.FullName), f.FullName);
+                }
+            }
+
+            return output;
+        }
+
+        private string GetFileHash(String filename)
+        {
+            using (var md5 = MD5.Create())
+            {
+                using (var stream = File.OpenRead(filename))
+                {
+                    var hash = md5.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                }
+            }
+
         }
     }
 }
