@@ -30,12 +30,12 @@ namespace DirectoryChecksumCheck
 
         private void btnChoose1_Click(object sender, RoutedEventArgs e)
         {
-            lblFolder1.Content = ChooseFolder();
+            lblFolder1.Content = "Folder 1: " + ChooseFolder();
         }
 
         private void btnChoose2_Click(object sender, RoutedEventArgs e)
         {
-            lblFolder2.Content = ChooseFolder();
+            lblFolder2.Content = "Folder 2: " + ChooseFolder();
         }
 
         private String ChooseFolder()
@@ -160,6 +160,11 @@ namespace DirectoryChecksumCheck
                     return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
                 }
             }
+
+        }
+
+        private void btnDuplicates_Click(object sender, RoutedEventArgs e)
+        {
 
         }
     }
