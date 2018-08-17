@@ -130,10 +130,11 @@ namespace DirectoryChecksumCheck
         private Dictionary<String,String> GetFileDictionary(DirectoryInfo di)
         {
             Dictionary<String, String> output = new Dictionary<string, string>();
+            string[] exts = txtExtensions.Text.Split(' ');
 
             foreach (FileInfo f in di.GetFiles())
             {
-                if (f.Extension.ToLowerInvariant().Equals(".jpg"))
+                if (exts.Contains(f.Extension.ToLowerInvariant()))
                 {
                     output.Add(GetFileHash(f.FullName), f.FullName);
                 }

@@ -11,7 +11,8 @@
         <Label x:Name="lblFolder1" Content="Folder 1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,7,0,0" Width="658"/>
         <Button x:Name="btnChoose2" Content="Choose Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,41,0,0" Click="btnChoose2_Click"/>
         <Label x:Name="lblFolder2" Content="Folder 2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,38,0,0" Width="658"/>
-        <Button x:Name="btnCompare" Content="Compare" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,72,0,0" Click="btnCompare_Click"/>
+        <Button x:Name="btnCompare" Content="Compare" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="134,72,0,0" Click="btnCompare_Click"/>
         <TextBox x:Name="txtOutput" HorizontalAlignment="Left" Height="309" TextWrapping="Wrap" VerticalAlignment="Top" Width="775" Margin="10,103,0,0" IsReadOnly="True"/>
+        <TextBox x:Name="txtExtensions" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text=".jpg" VerticalAlignment="Top" Width="112" Margin="10,72,0,0"/>
     </Grid>
 </Window>
