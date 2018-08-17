@@ -55,10 +55,41 @@ namespace DirectoryChecksumCheck
         {
             DirectoryInfo di = new DirectoryInfo(lblFolder1.Content.ToString());
 
-            foreach (String s in GetFileDictionary(di).Values)
+            foreach (String s in GetDirDictionary(di).Values)
             {
                 txtOutput.Text += s + "\n";
             }
+        }
+
+        private Dictionary<String,String> GetDirDictionary(DirectoryInfo di)
+        {
+            Dictionary<String, String> output = new Dictionary<string, string>();
+
+            if (di.GetDirectories().Length > 0)
+            {
+                foreach (DirectoryInfo d in di.GetDirectories())
+                {
+                    Dictionary<String, String> temp = new Dictionary<string, string>();
+                    temp = GetDirDictionary(d);
+
+                    output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
+                }
+            }
+
+            try
+            {
+                output = output.Concat(GetFileDictionary(di)).ToDictionary(x => x.Key, x => x.Value);
+            }
+            catch (System.ArgumentException)
+            {
+                // one or more identical duplicate files exist
+
+                
+                throw;
+            }
+            
+
+            return output;
         }
 
         private Dictionary<String,String> GetFileDictionary(DirectoryInfo di)
