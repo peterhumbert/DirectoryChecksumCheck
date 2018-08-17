@@ -53,12 +53,27 @@ namespace DirectoryChecksumCheck
 
         private void btnCompare_Click(object sender, RoutedEventArgs e)
         {
-            DirectoryInfo di = new DirectoryInfo(lblFolder1.Content.ToString());
+            DirectoryInfo di;
+            Dictionary<String, String> d1;
+            Dictionary<String, String> d2;
 
-            foreach (String s in GetDirDictionary(di).Values)
+            txtOutput.Clear();
+
+            di = new DirectoryInfo(lblFolder1.Content.ToString());
+            d1 = GetDirDictionary(di);
+
+            di = new DirectoryInfo(lblFolder2.Content.ToString());
+            d2 = GetDirDictionary(di);
+
+            foreach (String k in d1.Keys)
             {
-                txtOutput.Text += s + "\n";
+                if (!d2.Keys.Contains(k))
+                {
+                    txtOutput.Text += d1[k] + " : " + k + "\n";
+                }
             }
+
+            txtOutput.Text += "\n\nDONE";
         }
 
         private Dictionary<String,String> GetDirDictionary(DirectoryInfo di)
