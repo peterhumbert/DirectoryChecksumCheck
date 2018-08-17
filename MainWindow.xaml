@@ -12,7 +12,7 @@
         <Button x:Name="btnChoose2" Content="Choose Folder 2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,41,0,0" Click="btnChoose2_Click"/>
         <Label x:Name="lblFolder2" Content="Folder 2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,38,0,0" Width="658"/>
         <Button x:Name="btnCompare" Content="Compare" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="134,72,0,0" Click="btnCompare_Click" ToolTip="List files in Folder 1 that are not in Folder 2"/>
-        <TextBox x:Name="txtOutput" TextWrapping="Wrap" Margin="10,103,10,10.5" IsReadOnly="True"/>
+        <TextBox x:Name="txtOutput" TextWrapping="Wrap" Margin="10,103,10,10.5" IsReadOnly="True" ScrollViewer.CanContentScroll="True" VerticalScrollBarVisibility="Auto"/>
         <TextBox x:Name="txtExtensions" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text=".jpg" VerticalAlignment="Top" Width="112" Margin="10,72,0,0"/>
         <Button x:Name="btnDuplicates" Content="Find Duplicates" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112
                 " Margin="259,72,0,0" Click="btnDuplicates_Click" ToolTip="List Duplicates in Folder 1"/>

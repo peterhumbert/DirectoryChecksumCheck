@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System.IO;
 using System.Security.Cryptography;
+using System.ComponentModel;
 
 namespace DirectoryChecksumCheck
 {
@@ -57,6 +58,11 @@ namespace DirectoryChecksumCheck
             Dictionary<String, String> d1;
             Dictionary<String, String> d2;
 
+            btnChoose1.IsEnabled = false;
+            btnChoose2.IsEnabled = false;
+            txtExtensions.IsEnabled = false;
+            btnCompare.IsEnabled = false;
+            btnDuplicates.IsEnabled = false;
             txtOutput.Clear();
 
             txtOutput.Text += "Compare directories\n";
@@ -78,6 +84,12 @@ namespace DirectoryChecksumCheck
             }
 
             txtOutput.Text += "\n\nDONE";
+
+            btnChoose1.IsEnabled = true;
+            btnChoose2.IsEnabled = true;
+            txtExtensions.IsEnabled = true;
+            btnCompare.IsEnabled = true;
+            btnDuplicates.IsEnabled = true;
         }
 
         private Dictionary<String,String> GetDirDictionary(DirectoryInfo di)
@@ -171,34 +183,68 @@ namespace DirectoryChecksumCheck
         {
             Dictionary<String, Node> dup;
 
+            btnChoose1.IsEnabled = false;
+            btnChoose2.IsEnabled = false;
+            txtExtensions.IsEnabled = false;
+            btnCompare.IsEnabled = false;
+            btnDuplicates.IsEnabled = false;
             txtOutput.Clear();
 
             txtOutput.Text += "Find duplicates\n";
             txtOutput.Text += lblFolder1.Content.ToString() + "\n";
 
-            dup = GetDirDuplicates(new DirectoryInfo(lblFolder1.Content.ToString()));
+            BackgroundWorker bgWorker = new BackgroundWorker() { WorkerReportsProgress = true };
+            bgWorker.DoWork += (s, z) => {
+                ArgObj a = (ArgObj)z.Argument;
+                dup = GetDirDuplicates(a.di, a.exts);
 
-            foreach (String k in dup.Keys)
-            {
-                Node n = dup[k];
+                z.Result = dup;
 
-                if (n.hasNext)
+                
+                // Use bgWorker.ReportProgress(); to report the current progress  
+            };
+            bgWorker.ProgressChanged += (s, z) => {
+                // Here you will be informed about progress and here it is save to change/show progress. 
+                // You can access from here savely a ProgressBars or another control.  
+            };
+            bgWorker.RunWorkerCompleted += (s, z) => {
+                // Here you will be informed if the job is done. 
+                // Use this event to unlock your gui 
+
+                dup = (Dictionary<string, Node>)z.Result;
+                foreach (String k in dup.Keys)
                 {
-                    txtOutput.Text += "\n" + k + "\n";
-                    txtOutput.Text += n.path + "\n";
+                    Node n = dup[k];
 
-                    while (n.hasNext)
+                    if (n.hasNext)
                     {
-                        n = n.getNext();
+                        txtOutput.Text += "\n" + k + "\n";
                         txtOutput.Text += n.path + "\n";
+
+                        while (n.hasNext)
+                        {
+                            n = n.getNext();
+                            txtOutput.Text += n.path + "\n";
+                        }
                     }
                 }
-            }
 
-            txtOutput.Text += "\n\nDONE";
+                txtOutput.Text += "\n\nDONE";
+
+                btnChoose1.IsEnabled = true;
+                btnChoose2.IsEnabled = true;
+                txtExtensions.IsEnabled = true;
+                btnCompare.IsEnabled = true;
+                btnDuplicates.IsEnabled = true;
+            };
+            bgWorker.RunWorkerAsync(new ArgObj(new DirectoryInfo(lblFolder1.Content.ToString()),
+                txtExtensions.Text.Split(' ')));
+
+
+            
         }
 
-        private Dictionary<String, Node> GetDirDuplicates(DirectoryInfo di)
+        private Dictionary<String, Node> GetDirDuplicates(DirectoryInfo di, string[] exts)
         {
             Dictionary<String, Node> output = new Dictionary<String, Node>();
             Dictionary<String, Node> temp;
@@ -207,7 +253,7 @@ namespace DirectoryChecksumCheck
             {
                 foreach (DirectoryInfo d in di.GetDirectories())
                 {
-                    temp = GetDirDuplicates(d);
+                    temp = GetDirDuplicates(d, exts);
                     try
                     {
                         output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
@@ -232,7 +278,7 @@ namespace DirectoryChecksumCheck
                 }
             }
 
-            temp = GetFileDuplicates(di);
+            temp = GetFileDuplicates(di, exts);
 
             try
             {
@@ -261,10 +307,9 @@ namespace DirectoryChecksumCheck
             return output;
         }
 
-        private Dictionary<String, Node> GetFileDuplicates(DirectoryInfo di)
+        private Dictionary<String, Node> GetFileDuplicates(DirectoryInfo di, string[] exts)
         {
             Dictionary<String, Node> output = new Dictionary<string, Node>();
-            string[] exts = txtExtensions.Text.Split(' ');
 
             foreach (FileInfo f in di.GetFiles())
             {
