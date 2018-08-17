@@ -136,7 +136,14 @@ namespace DirectoryChecksumCheck
             {
                 if (exts.Contains(f.Extension.ToLowerInvariant()))
                 {
-                    output.Add(GetFileHash(f.FullName), f.FullName);
+                    try
+                    {
+                        output.Add(GetFileHash(f.FullName), f.FullName);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    
                 }
             }
 
