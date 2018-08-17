@@ -30,12 +30,12 @@ namespace DirectoryChecksumCheck
 
         private void btnChoose1_Click(object sender, RoutedEventArgs e)
         {
-            lblFolder1.Content = "Folder 1: " + ChooseFolder();
+            lblFolder1.Content = ChooseFolder();
         }
 
         private void btnChoose2_Click(object sender, RoutedEventArgs e)
         {
-            lblFolder2.Content = "Folder 2: " + ChooseFolder();
+            lblFolder2.Content = ChooseFolder();
         }
 
         private String ChooseFolder()
@@ -58,6 +58,10 @@ namespace DirectoryChecksumCheck
             Dictionary<String, String> d2;
 
             txtOutput.Clear();
+
+            txtOutput.Text += "Compare directories\n";
+            txtOutput.Text += lblFolder1.Content.ToString() + "\n";
+            txtOutput.Text += lblFolder2.Content.ToString() + "\n";
 
             di = new DirectoryInfo(lblFolder1.Content.ToString());
             d1 = GetDirDictionary(di);
@@ -127,7 +131,7 @@ namespace DirectoryChecksumCheck
             return output;
         }
 
-        private Dictionary<String,String> GetFileDictionary(DirectoryInfo di)
+        private Dictionary<String, String> GetFileDictionary(DirectoryInfo di)
         {
             Dictionary<String, String> output = new Dictionary<string, string>();
             string[] exts = txtExtensions.Text.Split(' ');
@@ -165,7 +169,95 @@ namespace DirectoryChecksumCheck
 
         private void btnDuplicates_Click(object sender, RoutedEventArgs e)
         {
+            Dictionary<String, String> dup;
 
+            txtOutput.Clear();
+
+            txtOutput.Text += "Find duplicates\n";
+            txtOutput.Text += lblFolder1.Content.ToString() + "\n";
+
+            dup = GetDirDuplicates(new DirectoryInfo(lblFolder1.Content.ToString()));
+
+            foreach (String k in dup.Keys)
+            {
+                txtOutput.Text += dup[k] + " : " + k + "\n";
+            }
+        }
+
+        private Dictionary<String, Node> GetDirDuplicates(DirectoryInfo di)
+        {
+            Dictionary<String, Node> dup = new Dictionary<string, Node>();
+            Dictionary<String, Node> temp;
+
+            if (di.GetDirectories().Length > 0)
+            {
+                foreach (DirectoryInfo d in di.GetDirectories())
+                {
+                    temp = new Dictionary<string, Node>();
+                    temp = GetDirDuplicates(d);
+
+                    foreach (String k in temp.Keys)
+                    {
+                        if (dup.ContainsKey(k))
+                        {
+                            Node n = dup[k];
+
+                            while (n.hasNext)
+                                n = n.getNext();
+
+                            n.setNext(temp[k]);
+                        }
+                        else
+                        {
+                            dup.Add(k, temp[k]);
+                        }
+                    }
+                }
+            }
+
+            temp = GetFileDuplicates(di);
+
+            foreach (String k in temp.Keys)
+            {
+                if (dup.ContainsKey(k))
+                {
+                    Node n = dup[k];
+
+                    while (n.hasNext)
+                        n = n.getNext();
+
+                    n.setNext(temp[k]);
+                }
+                else
+                {
+                    dup.Add(k, temp[k]);
+                }
+            }
+
+            return dup;
+        }
+
+        private Dictionary<String, Node> GetFileDuplicates(DirectoryInfo di)
+        {
+            Dictionary<String, Node> output = new Dictionary<String, Node>();
+            string[] exts = txtExtensions.Text.Split(' ');
+
+            foreach (FileInfo f in di.GetFiles())
+            {
+                if (exts.Contains(f.Extension.ToLowerInvariant()))
+                {
+                    try
+                    {
+                        output.Add(GetFileHash(f.FullName), f.FullName);
+                    }
+                    catch (Exception)
+                    {
+                    }
+
+                }
+            }
+
+            return output;
         }
     }
 }

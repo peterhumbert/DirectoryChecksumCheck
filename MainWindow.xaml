@@ -7,9 +7,9 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button x:Name="btnChoose1" Content="Choose Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,10,0,0" Click="btnChoose1_Click"/>
+        <Button x:Name="btnChoose1" Content="Choose Folder 1" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,10,0,0" Click="btnChoose1_Click"/>
         <Label x:Name="lblFolder1" Content="Folder 1" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,7,0,0" Width="658"/>
-        <Button x:Name="btnChoose2" Content="Choose Folder" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,41,0,0" Click="btnChoose2_Click"/>
+        <Button x:Name="btnChoose2" Content="Choose Folder 2" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="10,41,0,0" Click="btnChoose2_Click"/>
         <Label x:Name="lblFolder2" Content="Folder 2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="127,38,0,0" Width="658"/>
         <Button x:Name="btnCompare" Content="Compare" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="134,72,0,0" Click="btnCompare_Click" ToolTip="List files in Folder 1 that are not in Folder 2"/>
         <TextBox x:Name="txtOutput" TextWrapping="Wrap" Margin="10,103,10,10.5" IsReadOnly="True"/>
