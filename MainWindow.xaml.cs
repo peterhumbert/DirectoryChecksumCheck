@@ -169,7 +169,7 @@ namespace DirectoryChecksumCheck
 
         private void btnDuplicates_Click(object sender, RoutedEventArgs e)
         {
-            Dictionary<String, String> dup;
+            Dictionary<String, Node> dup;
 
             txtOutput.Clear();
 
@@ -180,36 +180,53 @@ namespace DirectoryChecksumCheck
 
             foreach (String k in dup.Keys)
             {
-                txtOutput.Text += dup[k] + " : " + k + "\n";
+                Node n = dup[k];
+
+                if (n.hasNext)
+                {
+                    txtOutput.Text += "\n" + k + "\n";
+                    txtOutput.Text += n.path + "\n";
+
+                    while (n.hasNext)
+                    {
+                        n = n.getNext();
+                        txtOutput.Text += n.path + "\n";
+                    }
+                }
             }
+
+            txtOutput.Text += "\n\nDONE";
         }
 
         private Dictionary<String, Node> GetDirDuplicates(DirectoryInfo di)
         {
-            Dictionary<String, Node> dup = new Dictionary<string, Node>();
+            Dictionary<String, Node> output = new Dictionary<String, Node>();
             Dictionary<String, Node> temp;
 
             if (di.GetDirectories().Length > 0)
             {
                 foreach (DirectoryInfo d in di.GetDirectories())
                 {
-                    temp = new Dictionary<string, Node>();
                     temp = GetDirDuplicates(d);
-
-                    foreach (String k in temp.Keys)
+                    try
                     {
-                        if (dup.ContainsKey(k))
+                        output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
+                    }
+                    catch (System.ArgumentException)
+                    {
+                        foreach (var k in temp.Keys)
                         {
-                            Node n = dup[k];
+                            if (!output.ContainsKey(k))
+                                output.Add(k, temp[k]);
+                            else
+                            {
+                                Node n = output[k];
 
-                            while (n.hasNext)
-                                n = n.getNext();
+                                while (n.hasNext)
+                                    n = n.getNext();
 
-                            n.setNext(temp[k]);
-                        }
-                        else
-                        {
-                            dup.Add(k, temp[k]);
+                                n.setNext(temp[k]);
+                            }
                         }
                     }
                 }
@@ -217,41 +234,51 @@ namespace DirectoryChecksumCheck
 
             temp = GetFileDuplicates(di);
 
-            foreach (String k in temp.Keys)
+            try
             {
-                if (dup.ContainsKey(k))
+                output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
+            }
+            catch (System.ArgumentException)
+            {
+                // one or more identical/duplicate checksums exist
+                foreach (var k in temp.Keys)
                 {
-                    Node n = dup[k];
+                    if (!output.ContainsKey(k))
+                        output.Add(k, temp[k]);
+                    else
+                    {
+                        Node n = output[k];
 
-                    while (n.hasNext)
-                        n = n.getNext();
+                        while (n.hasNext)
+                            n = n.getNext();
 
-                    n.setNext(temp[k]);
-                }
-                else
-                {
-                    dup.Add(k, temp[k]);
+                        n.setNext(temp[k]);
+                    }
                 }
             }
 
-            return dup;
+
+            return output;
         }
 
         private Dictionary<String, Node> GetFileDuplicates(DirectoryInfo di)
         {
-            Dictionary<String, Node> output = new Dictionary<String, Node>();
+            Dictionary<String, Node> output = new Dictionary<string, Node>();
             string[] exts = txtExtensions.Text.Split(' ');
 
             foreach (FileInfo f in di.GetFiles())
             {
                 if (exts.Contains(f.Extension.ToLowerInvariant()))
                 {
+                    string k = GetFileHash(f.FullName);
                     try
                     {
-                        output.Add(GetFileHash(f.FullName), f.FullName);
+                        output.Add(k, new Node(f.FullName));
                     }
                     catch (Exception)
                     {
+                        Node n = new Node(f.FullName, output[k]);
+                        output[k] = n;
                     }
 
                 }

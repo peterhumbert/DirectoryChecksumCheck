@@ -9,24 +9,28 @@ namespace DirectoryChecksumCheck
     class Node
     {
         private Node next { get; set; }
-        private Node prev { get; set; }
-        private string path { get; set; }
+        public string path { get; set; }
         public bool hasNext { get; set; }
 
         public Node()
         {
             next = null;
-            prev = null;
             path = null;
             hasNext = false;
         }
 
-        public Node()
+        public Node(String fullname)
         {
             next = null;
-            prev = null;
-            path = null;
+            path = fullname;
             hasNext = false;
+        }
+
+        public Node(String fullname, Node n)
+        {
+            next = n;
+            path = fullname;
+            hasNext = true;
         }
 
         public Node getNext()
