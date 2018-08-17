@@ -72,8 +72,21 @@ namespace DirectoryChecksumCheck
                 {
                     temp = new Dictionary<string, string>();
                     temp = GetDirDictionary(d);
-
-                    output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
+                    try
+                    {
+                        output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
+                    }
+                    catch (System.ArgumentException)
+                    {
+                        foreach (var k in temp.Keys)
+                        {
+                            if (!output.ContainsKey(k))
+                            {
+                                output.Add(k, temp[k]);
+                            }
+                        }
+                    }
+                    
                 }
             }
 
