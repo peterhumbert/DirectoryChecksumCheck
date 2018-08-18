@@ -179,7 +179,7 @@ namespace DirectoryChecksumCheck
 
         }
 
-        private void btnDuplicates_Click(object sender, RoutedEventArgs e)
+        private void Wrapper(bool compare)
         {
             Dictionary<String, Node> dup;
 
@@ -190,8 +190,16 @@ namespace DirectoryChecksumCheck
             btnDuplicates.IsEnabled = false;
             txtOutput.Clear();
 
-            txtOutput.Text += "Find duplicates\n";
-            txtOutput.Text += lblFolder1.Content.ToString() + "\n";
+            if (compare)
+            {
+
+            }
+            else
+            {
+                txtOutput.Text += "Find duplicates\n";
+                txtOutput.Text += lblFolder1.Content.ToString() + "\n";
+            }
+            
 
             BackgroundWorker bgWorker = new BackgroundWorker() { WorkerReportsProgress = true };
             bgWorker.DoWork += (s, z) => {
@@ -200,7 +208,7 @@ namespace DirectoryChecksumCheck
 
                 z.Result = dup;
 
-                
+
                 // Use bgWorker.ReportProgress(); to report the current progress  
             };
             bgWorker.ProgressChanged += (s, z) => {
@@ -212,22 +220,31 @@ namespace DirectoryChecksumCheck
                 // Use this event to unlock your gui 
 
                 dup = (Dictionary<string, Node>)z.Result;
-                foreach (String k in dup.Keys)
+
+                if (compare)
                 {
-                    Node n = dup[k];
 
-                    if (n.hasNext)
+                }
+                else
+                {
+                    foreach (String k in dup.Keys)
                     {
-                        txtOutput.Text += "\n" + k + "\n";
-                        txtOutput.Text += n.path + "\n";
+                        Node n = dup[k];
 
-                        while (n.hasNext)
+                        if (n.hasNext)
                         {
-                            n = n.getNext();
+                            txtOutput.Text += "\n" + k + "\n";
                             txtOutput.Text += n.path + "\n";
+
+                            while (n.hasNext)
+                            {
+                                n = n.getNext();
+                                txtOutput.Text += n.path + "\n";
+                            }
                         }
                     }
                 }
+                
 
                 txtOutput.Text += "\n\nDONE";
 
@@ -239,9 +256,11 @@ namespace DirectoryChecksumCheck
             };
             bgWorker.RunWorkerAsync(new ArgObj(new DirectoryInfo(lblFolder1.Content.ToString()),
                 txtExtensions.Text.Split(' ')));
+        }
 
-
-            
+        private void btnDuplicates_Click(object sender, RoutedEventArgs e)
+        {
+            Wrapper(false);
         }
 
         private Dictionary<String, Node> GetDirDuplicates(DirectoryInfo di, string[] exts)
