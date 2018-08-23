@@ -16,5 +16,6 @@
         <TextBox x:Name="txtExtensions" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" Text=".jpg" VerticalAlignment="Top" Width="112" Margin="10,72,0,0"/>
         <Button x:Name="btnDuplicates" Content="Find Duplicates" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112
                 " Margin="259,72,0,0" Click="btnDuplicates_Click" ToolTip="List Duplicates in Folder 1"/>
+        <Button x:Name="btnOpenImgViewer" Content="Open Image Viewer" HorizontalAlignment="Left" VerticalAlignment="Top" Width="112" Margin="384,72,0,0" Click="btnOpenImgViewer_Click"/>
     </Grid>
 </Window>

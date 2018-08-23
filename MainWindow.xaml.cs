@@ -269,5 +269,11 @@ namespace DirectoryChecksumCheck
 
             return output;
         }
+
+        private void btnOpenImgViewer_Click(object sender, RoutedEventArgs e)
+        {
+            ImageViewer imageViewer = new ImageViewer();
+            imageViewer.Show();
+        }
     }
 }
