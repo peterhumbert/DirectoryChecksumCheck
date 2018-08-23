@@ -39,7 +39,7 @@ namespace DirectoryChecksumCheck
             lblFolder2.Content = ChooseFolder();
         }
 
-        private String ChooseFolder()
+        private string ChooseFolder()
         {
             var dialog = new CommonOpenFileDialog();
             dialog.IsFolderPicker = true;
@@ -54,116 +54,7 @@ namespace DirectoryChecksumCheck
 
         private void btnCompare_Click(object sender, RoutedEventArgs e)
         {
-            DirectoryInfo di;
-            Dictionary<String, String> d1;
-            Dictionary<String, String> d2;
-
-            btnChoose1.IsEnabled = false;
-            btnChoose2.IsEnabled = false;
-            txtExtensions.IsEnabled = false;
-            btnCompare.IsEnabled = false;
-            btnDuplicates.IsEnabled = false;
-            txtOutput.Clear();
-
-            txtOutput.Text += "Compare directories\n";
-            txtOutput.Text += lblFolder1.Content.ToString() + "\n";
-            txtOutput.Text += lblFolder2.Content.ToString() + "\n";
-
-            di = new DirectoryInfo(lblFolder1.Content.ToString());
-            d1 = GetDirDictionary(di);
-
-            di = new DirectoryInfo(lblFolder2.Content.ToString());
-            d2 = GetDirDictionary(di);
-
-            foreach (String k in d1.Keys)
-            {
-                if (!d2.Keys.Contains(k))
-                {
-                    txtOutput.Text += d1[k] + " : " + k + "\n";
-                }
-            }
-
-            txtOutput.Text += "\n\nDONE";
-
-            btnChoose1.IsEnabled = true;
-            btnChoose2.IsEnabled = true;
-            txtExtensions.IsEnabled = true;
-            btnCompare.IsEnabled = true;
-            btnDuplicates.IsEnabled = true;
-        }
-
-        private Dictionary<String,String> GetDirDictionary(DirectoryInfo di)
-        {
-            Dictionary<String, String> output = new Dictionary<string, string>();
-            Dictionary<String, String> temp;
-
-            if (di.GetDirectories().Length > 0)
-            {
-                foreach (DirectoryInfo d in di.GetDirectories())
-                {
-                    temp = new Dictionary<string, string>();
-                    temp = GetDirDictionary(d);
-                    try
-                    {
-                        output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
-                    }
-                    catch (System.ArgumentException)
-                    {
-                        foreach (var k in temp.Keys)
-                        {
-                            if (!output.ContainsKey(k))
-                            {
-                                output.Add(k, temp[k]);
-                            }
-                        }
-                    }
-                    
-                }
-            }
-
-            temp = GetFileDictionary(di);
-
-            try
-            {
-                output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
-            }
-            catch (System.ArgumentException)
-            {
-                // one or more identical duplicate files exist
-                foreach (var k in temp.Keys)
-                {
-                    if (!output.ContainsKey(k))
-                    {
-                        output.Add(k, temp[k]);
-                    }
-                }
-            }
-            
-
-            return output;
-        }
-
-        private Dictionary<String, String> GetFileDictionary(DirectoryInfo di)
-        {
-            Dictionary<String, String> output = new Dictionary<string, string>();
-            string[] exts = txtExtensions.Text.Split(' ');
-
-            foreach (FileInfo f in di.GetFiles())
-            {
-                if (exts.Contains(f.Extension.ToLowerInvariant()))
-                {
-                    try
-                    {
-                        output.Add(GetFileHash(f.FullName), f.FullName);
-                    }
-                    catch (Exception)
-                    {
-                    }
-                    
-                }
-            }
-
-            return output;
+            ExecutionWrapper(true);
         }
 
         private string GetFileHash(String filename)
@@ -173,15 +64,17 @@ namespace DirectoryChecksumCheck
                 using (var stream = File.OpenRead(filename))
                 {
                     var hash = md5.ComputeHash(stream);
-                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    string output = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    stream.Close();
+                    return output;
                 }
             }
 
         }
 
-        private void Wrapper(bool compare)
+        private void ExecutionWrapper(bool compare)
         {
-            Dictionary<String, Node> dup;
+            Dictionary<String, Node> result;
 
             btnChoose1.IsEnabled = false;
             btnChoose2.IsEnabled = false;
@@ -192,7 +85,9 @@ namespace DirectoryChecksumCheck
 
             if (compare)
             {
-
+                txtOutput.Text += "Compare\n";
+                txtOutput.Text += lblFolder1.Content.ToString() + "\n";
+                txtOutput.Text += lblFolder2.Content.ToString() + "\n";
             }
             else
             {
@@ -201,35 +96,48 @@ namespace DirectoryChecksumCheck
             }
             
 
-            BackgroundWorker bgWorker = new BackgroundWorker() { WorkerReportsProgress = true };
+            BackgroundWorker bgWorker = new BackgroundWorker() { WorkerReportsProgress = false };
             bgWorker.DoWork += (s, z) => {
                 ArgObj a = (ArgObj)z.Argument;
-                dup = GetDirDuplicates(a.di, a.exts);
 
-                z.Result = dup;
+                if (compare)
+                {
+                    Dictionary<String, Node> d1, d2;
+                    result = new Dictionary<string, Node>();
 
+                    d1 = GetDirDictionary(a.di1, a.exts);
+                    d2 = GetDirDictionary(a.di2, a.exts);
 
-                // Use bgWorker.ReportProgress(); to report the current progress  
-            };
-            bgWorker.ProgressChanged += (s, z) => {
-                // Here you will be informed about progress and here it is save to change/show progress. 
-                // You can access from here savely a ProgressBars or another control.  
+                    foreach (string k in d1.Keys)
+                    {
+                        if (!d2.ContainsKey(k))
+                            result.Add(k, d1[k]);
+                    }
+                }
+                else
+                {
+                    result = GetDirDictionary(a.di1, a.exts);
+                }
+
+                z.Result = result;
             };
             bgWorker.RunWorkerCompleted += (s, z) => {
                 // Here you will be informed if the job is done. 
                 // Use this event to unlock your gui 
 
-                dup = (Dictionary<string, Node>)z.Result;
+                result = (Dictionary<string, Node>)z.Result;
 
                 if (compare)
                 {
-
+                    txtOutput.Text += "\n";
+                    foreach (string k in result.Keys)
+                        txtOutput.Text += result[k].path + " : " + k + "\n";          
                 }
                 else
                 {
-                    foreach (String k in dup.Keys)
+                    foreach (String k in result.Keys)
                     {
-                        Node n = dup[k];
+                        Node n = result[k];
 
                         if (n.hasNext)
                         {
@@ -254,16 +162,27 @@ namespace DirectoryChecksumCheck
                 btnCompare.IsEnabled = true;
                 btnDuplicates.IsEnabled = true;
             };
-            bgWorker.RunWorkerAsync(new ArgObj(new DirectoryInfo(lblFolder1.Content.ToString()),
-                txtExtensions.Text.Split(' ')));
+
+            if (compare)
+            {
+                bgWorker.RunWorkerAsync(new ArgObj(new DirectoryInfo(lblFolder1.Content.ToString()),
+                    new DirectoryInfo(lblFolder2.Content.ToString()),
+                    txtExtensions.Text.Split(' ')));
+            }
+            else
+            {
+                bgWorker.RunWorkerAsync(new ArgObj(new DirectoryInfo(lblFolder1.Content.ToString()),
+                    txtExtensions.Text.Split(' ')));
+            }
+            
         }
 
         private void btnDuplicates_Click(object sender, RoutedEventArgs e)
         {
-            Wrapper(false);
+            ExecutionWrapper(false);
         }
 
-        private Dictionary<String, Node> GetDirDuplicates(DirectoryInfo di, string[] exts)
+        private Dictionary<String, Node> GetDirDictionary(DirectoryInfo di, string[] exts)
         {
             Dictionary<String, Node> output = new Dictionary<String, Node>();
             Dictionary<String, Node> temp;
@@ -272,7 +191,7 @@ namespace DirectoryChecksumCheck
             {
                 foreach (DirectoryInfo d in di.GetDirectories())
                 {
-                    temp = GetDirDuplicates(d, exts);
+                    temp = GetDirDictionary(d, exts);
                     try
                     {
                         output = output.Concat(temp).ToDictionary(x => x.Key, x => x.Value);
@@ -297,7 +216,7 @@ namespace DirectoryChecksumCheck
                 }
             }
 
-            temp = GetFileDuplicates(di, exts);
+            temp = GetFileDictionary(di, exts);
 
             try
             {
@@ -326,7 +245,7 @@ namespace DirectoryChecksumCheck
             return output;
         }
 
-        private Dictionary<String, Node> GetFileDuplicates(DirectoryInfo di, string[] exts)
+        private Dictionary<String, Node> GetFileDictionary(DirectoryInfo di, string[] exts)
         {
             Dictionary<String, Node> output = new Dictionary<string, Node>();
 

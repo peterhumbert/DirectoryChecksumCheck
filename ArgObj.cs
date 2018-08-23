@@ -9,13 +9,19 @@ namespace DirectoryChecksumCheck
 {
     class ArgObj
     {
-        public DirectoryInfo di { get; set; }
+        public DirectoryInfo di1 { get; set; }
+        public DirectoryInfo di2 { get; set; }
         public string[] exts { get; set; }
 
-        public ArgObj(DirectoryInfo di, string[] exts)
+        public ArgObj(DirectoryInfo di1, string[] exts)
         {
-            this.di = di;
+            this.di1 = di1;
             this.exts = exts;
+        }
+
+        public ArgObj(DirectoryInfo di1, DirectoryInfo di2, string[] exts) : this(di1, exts)
+        {
+            this.di2 = di2;
         }
     }
 }
