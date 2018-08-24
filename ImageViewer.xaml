@@ -9,8 +9,9 @@
     <Grid>
         <Label x:Name="lblNumber" Content="Image X of Y" HorizontalAlignment="Left" VerticalAlignment="Top"/>
         <Image x:Name="img" Margin="10,31,10,10.5"/>
-        <Button x:Name="btnNext" Content="" HorizontalAlignment="Left" Height="422" Margin="403,0,0,0" VerticalAlignment="Top" Width="392" Background="#00DDDDDD" Click="btnNext_Click" Foreground="#00000000" BorderBrush="#00707070" Opacity="0"/>
-        <Button x:Name="btnPrev" Content="" HorizontalAlignment="Left" Height="422" VerticalAlignment="Top" Width="392" Background="#00DDDDDD" Click="btnPrev_Click" Foreground="#00000000" BorderBrush="#00707070" Opacity="0"/>
+        <Button x:Name="btnNext" Content="" HorizontalAlignment="Left" Height="381" Margin="403,31,0,0" VerticalAlignment="Top" Width="382" Background="#00DDDDDD" Click="btnNext_Click" Foreground="#00000000" BorderBrush="#00707070" Opacity="0"/>
+        <Button x:Name="btnPrev" Content="" Background="#00DDDDDD" Click="btnPrev_Click" Foreground="#00000000" BorderBrush="#00707070" Opacity="0" Margin="10,31,0,0" HorizontalAlignment="Left" Width="382" Height="381" VerticalAlignment="Top"/>
+        <Button Content="Button" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="710,3,0,0"/>
 
     </Grid>
 </Window>

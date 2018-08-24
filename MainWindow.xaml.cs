@@ -24,6 +24,8 @@ namespace DirectoryChecksumCheck
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Dictionary<string, Node> output;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -126,6 +128,7 @@ namespace DirectoryChecksumCheck
                 // Use this event to unlock your gui 
 
                 result = (Dictionary<string, Node>)z.Result;
+                this.output = result;
 
                 if (compare)
                 {
@@ -272,7 +275,7 @@ namespace DirectoryChecksumCheck
 
         private void btnOpenImgViewer_Click(object sender, RoutedEventArgs e)
         {
-            ImageViewer imageViewer = new ImageViewer();
+            ImageViewer imageViewer = new ImageViewer(this.output);
             imageViewer.Show();
         }
     }

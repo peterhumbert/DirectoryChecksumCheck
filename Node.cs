@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DirectoryChecksumCheck
 {
-    class Node
+    public class Node
     {
         private Node next { get; set; }
         public string path { get; set; }

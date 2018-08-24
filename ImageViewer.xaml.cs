@@ -19,20 +19,39 @@ namespace DirectoryChecksumCheck
     /// </summary>
     public partial class ImageViewer : Window
     {
-        public ImageViewer()
+        private Dictionary<string, Node> result;
+        private string[] checksums;
+        private Node[] files;
+        private int i = 0;
+
+        public ImageViewer(Dictionary<string, Node> result)
         {
             InitializeComponent();
-            img.Source = new BitmapImage(new Uri(@"C:\Users\Peter\Pictures\IMAG0127.jpg"));
+            this.result = result;
+            checksums = result.Keys.ToArray<string>();
+            files = result.Values.ToArray<Node>();
+            img.Source = new BitmapImage(new Uri(files[i].path));
+            lblNumber.Content = "Image " + (i+1) + " of " + files.Length + ": " + files[i].path;
         }
 
         private void btnPrev_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("Prev");
+            i--;
+            if (i < 0)
+                i = checksums.Length-1;
+
+            img.Source = new BitmapImage(new Uri(files[i].path));
+            lblNumber.Content = "Image " + (i+1) + " of " + files.Length + ": " + files[i].path;
         }
 
         private void btnNext_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("Next");
+            i++;
+            if (i >= checksums.Length)
+                i = 0;
+
+            img.Source = new BitmapImage(new Uri(files[i].path));
+            lblNumber.Content = "Image " + (i+1) + " of " + files.Length + ": " + files[i].path;
         }
     }
 }
